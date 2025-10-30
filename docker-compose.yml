@@ -1,0 +1,37 @@
+services:
+  backend:
+    build: ./backend
+    container_name: deepseek-ocr-backend
+    environment:
+      MODEL_NAME: deepseek-ai/DeepSeek-OCR
+      HF_HOME: /models
+    volumes:
+      - ./models:/models
+      - ./ferrero_checks:/ferrero_checks  # <-- add this line
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    shm_size: "4g"
+    ports:
+      - "8000:8000"
+    networks:
+      - ocr-network
+
+  frontend:
+    build: ./frontend
+    container_name: deepseek-ocr-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - ocr-network
+
+networks:
+  ocr-network:
+    driver: bridge
