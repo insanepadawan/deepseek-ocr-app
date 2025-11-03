@@ -7,7 +7,7 @@ services:
       HF_HOME: /models
     volumes:
       - ./models:/models
-      - ./ferrero_checks:/ferrero_checks  # <-- add this line
+      - ./checks:/checks  # <-- add this line
 
     deploy:
       resources:

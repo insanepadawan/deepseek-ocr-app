@@ -346,7 +346,7 @@ async def ocr_inference(
             text = "\n".join(map(str, res)).strip()
         else:
             text = ""
-        
+
         # Fallback: check output file
         if not text:
             mmd = os.path.join(out_dir, "result.mmd")
@@ -355,18 +355,18 @@ async def ocr_inference(
                     text = fh.read().strip()
         if not text:
             text = "No text returned by model."
-        
+
         # Parse grounding boxes with proper coordinate scaling
         boxes = parse_detections(text, orig_w or 1, orig_h or 1) if ("<|det|>" in text or "<|ref|>" in text) else []
-        
+
         # Clean grounding tags from display text, but keep the labels
         display_text = clean_grounding_text(text) if ("<|ref|>" in text or "<|grounding|>" in text) else text
-        
+
         # If display text is empty after cleaning but we have boxes, show the labels
         if not display_text and boxes:
             display_text = ", ".join([b["label"] for b in boxes])
 
-        PRODUCT_KEYWORDS = ["ferrero", "nutella", "raffaello"]
+        PRODUCT_KEYWORDS = ["orbit"]
 
         receipt = getReceiptData(display_text, PRODUCT_KEYWORDS)
 
@@ -474,7 +474,7 @@ def getReceiptData(text, product_keywords=None):
     return res
 
 async def start_batch():
-    IMAGES_FOLDER = "/ferrero_checks"
+    IMAGES_FOLDER = "/checks"
     OUTPUT_JSON = "ocr_results.json"
     BATCH_SIZE = 3
 
@@ -484,8 +484,12 @@ async def start_batch():
         if f.lower().endswith((".jpg", ".jpeg", ".png"))
     ]
 
-    with open('data.json', 'r') as f:
-        data = json.load(f)
+    try:
+        with open('data.json', 'r') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        # File doesn't exist, just ignore
+        data = []
 
     exclude_image_names = [item["image"] for item in data if "image" in item]
 
@@ -585,7 +589,7 @@ async def process_image(client: httpx.AsyncClient, image_path: str) -> Dict:
             return {
                 "status": "failed",
                 "image": filename,
-                # "ocr_result": ocr_result["text"],
+                "ocr_result": ocr_result["text"],
                 "payload": ocr_result["detected"]
             }
         else:
@@ -594,7 +598,7 @@ async def process_image(client: httpx.AsyncClient, image_path: str) -> Dict:
 
             return {
                 "image": filename,
-                # "ocr_result": ocr_result["text"],
+                "ocr_result": ocr_result["text"],
                 "payload": ocr_result["detected"],
                 "parsed_response": api_response,
             }

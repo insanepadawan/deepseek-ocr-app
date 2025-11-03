@@ -100,3 +100,8 @@ temp/
 .DS_Store
 Thumbs.db
 Desktop.ini
+.idea
+checks
+checks/*
+data.json
+models
