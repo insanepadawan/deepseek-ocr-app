@@ -6,7 +6,7 @@ from difflib import SequenceMatcher
 from typing import List, Dict, Any, Optional
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import torch
@@ -250,15 +250,18 @@ def parse_detections(text: str, image_width: int, image_height: int) -> List[Dic
 # Routes
 # -----------------------------
 @app.get("/")
-async def root():
+async def root(response: Response):
+    response.headers["X-Robots-Tag"] = "noindex"
     return {"message": "DeepSeek-OCR API is running! 🚀", "docs": "/docs"}
 
 @app.get("/health")
-async def health():
+async def health(response: Response):
+    response.headers["X-Robots-Tag"] = "noindex"
     return {"status": "healthy", "model_loaded": model is not None}
 
 @app.get("/process-images-payload")
-async def process_images_batch():
+async def process_images_batch(response: Response):
+    response.headers["X-Robots-Tag"] = "noindex"
     await start_batch()
     return {"message": "DeepSeek-OCR API batch started"}
 
