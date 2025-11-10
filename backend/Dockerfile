@@ -14,7 +14,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy backend code
 COPY main.py .
 
-COPY data.json .
+#COPY data.json .
 
 EXPOSE 8000
 
